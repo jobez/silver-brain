@@ -6,7 +6,13 @@
                 #:defprofile)
   (:import-from #:find-port
                 #:find-port)
-  (:export #:set-profile))
+  (:export #:set-profile
+           #:database-driver-name
+           #:database-file-name
+           #:server-access-log-p
+           #:server-port
+           #:server-use-thread-p
+           #:debugp))
 
 (defpackage silver-brain.core
   (:nicknames core)

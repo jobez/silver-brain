@@ -43,6 +43,7 @@ Supported values are: plain, markdown, org")
 (define-key silver-brain-mode-map (kbd "C-x C-s") 'silver-brain-save)
 (define-key silver-brain-mode-map (kbd "g") 'silver-brain-refresh)
 (define-key silver-brain-mode-map (kbd "r") 'silver-brain-rename)
+(define-key silver-brain-mode-map (kbd "c") 'silver-brain-get-uuid-at-point)
 (define-key silver-brain-mode-map (kbd "s") 'silver-brain-save)
 (define-key silver-brain-mode-map (kbd "o") 'silver-brain)
 (define-key silver-brain-mode-map (kbd "O") 'silver-brain-new-window)
@@ -58,9 +59,18 @@ Supported values are: plain, markdown, org")
 
 (add-hook 'silver-brain-mode-hook 'silver-brain--poly-mode)
 
+(org-link-set-parameters
+ "sb"
+ :face '(:background "purple")
+ :follow (lambda (path)
+           (silver-brain--open-concept path)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                              UI                              ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun silver-brain-get-uuid-at-point (point)
+  (interactive "d")
+  (copy-to-clipboard (get-text-property point 'uuid)))
 
 ;;;###autoload
 (defun silver-brain-follow-link (&optional event)
