@@ -30,3 +30,6 @@ If not, the application hangs after starting the web server.")
   (ensure-directories-exist (app-root))
   (uiop:chdir (app-root))
   (setf *default-pathname-defaults* (app-root)))
+
+
+(set-profile :dev)

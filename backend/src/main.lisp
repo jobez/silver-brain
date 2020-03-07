@@ -39,3 +39,6 @@ PROFILE is either 'product' (default) or 'dev'"
 Starts the server of Silver Brain software."
                  :usage-of "silver-brain")
   (uiop:quit 0))
+
+
+;; (config:set-profile :dev)

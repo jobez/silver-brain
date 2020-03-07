@@ -43,7 +43,7 @@ Supported values are: plain, markdown, org")
 (define-key silver-brain-mode-map (kbd "C-x C-s") 'silver-brain-save)
 (define-key silver-brain-mode-map (kbd "g") 'silver-brain-refresh)
 (define-key silver-brain-mode-map (kbd "r") 'silver-brain-rename)
-(define-key silver-brain-mode-map (kbd "c") 'silver-brain-get-uuid-at-point)
+(define-key silver-brain-mode-map (kbd "C-x C-c") 'silver-brain-get-uuid-at-point)
 (define-key silver-brain-mode-map (kbd "s") 'silver-brain-save)
 (define-key silver-brain-mode-map (kbd "o") 'silver-brain)
 (define-key silver-brain-mode-map (kbd "O") 'silver-brain-new-window)
@@ -70,7 +70,42 @@ Supported values are: plain, markdown, org")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun silver-brain-get-uuid-at-point (point)
   (interactive "d")
-  (copy-to-clipboard (get-text-property point 'uuid)))
+  (copy-to-clipboard
+   (format "[[sb:%s][%s]]"
+           (get-text-property point 'uuid)
+           (thing-at-point 'word 'no-properties))))
+
+(defun silver-brain-org ()
+  (interactive )
+  (let* ((target-uuid (silver-brain-search))
+         (concept-name
+          (silver-brain-concept-name
+           (silver-brain-api--get-concept target-uuid))))
+   (copy-to-clipboard
+    (format "[[sb:%s][%s]]"
+            target-uuid
+            concept-name))))
+
+(defun silver-brain-org-insert (point)
+  (interactive "p")
+  (let* ((target-uuid (silver-brain-search))
+         (concept-name
+          (silver-brain-concept-name
+           (silver-brain-api--get-concept target-uuid))))
+   (insert
+    (format "[[sb:%s][%s]]"
+            target-uuid
+            concept-name))))
+
+
+(defun silver-brain-get-org-link-of-sb-buffer ()
+  (interactive)
+  (copy-to-clipboard
+   (format "[[sb:%s][%s]]"
+           (silver-brain-concept-uuid silver-brain--concept)
+           (silver-brain-concept-name silver-brain--concept))))
+
+
 
 ;;;###autoload
 (defun silver-brain-follow-link (&optional event)

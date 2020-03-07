@@ -6,13 +6,15 @@
 
 ;;; Code:
 
-(defvar silver-brain-server-port 5000
+(defvar silver-brain-server-port 15000
   "The port of Silver Brain server.")
 
 (defun silver-brain-api--get-all-concepts ()
   "Return all concepts."
   (mapcar #'silver-brain-api--plist-to-concept
           (silver-brain-api--get "/concepts")))
+
+
 
 (defun silver-brain-api--get-concept (uuid)
   "Get specific concept by UUID."

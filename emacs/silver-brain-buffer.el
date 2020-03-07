@@ -47,6 +47,7 @@ If NO-EDITOR-P is T, exclude the side buffers used by poly-mode."
     (silver-brain-kill-concept)
     (switch-to-buffer (silver-brain--make-concept-buffer-name concept))
     (silver-brain-mode)
+    ;; (olivetti-mode)
     (silver-brain--setup-buffer concept)))
 
 (defun silver-brain--open-concept-new-window (uuid)
