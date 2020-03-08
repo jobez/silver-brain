@@ -32,11 +32,12 @@ Supported values are: plain, markdown, org")
 ;;;;                             Modes                            ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define-derived-mode silver-brain-mode text-mode "Brain"
+(define-derived-mode silver-brain-mode magit-section-mode "Brain"
   "Main mode for single concept Silver Brain."
   )
 
-(define-key silver-brain-mode-map (kbd "<tab>") 'silver-brain-jump-to-next-link)
+
+(define-key silver-brain-mode-map (kbd "<tab>") 'magit-section-cycle)
 (define-key silver-brain-mode-map (kbd "<backtab>") 'silver-brain-jump-to-previous-link)
 (define-key silver-brain-mode-map (kbd "<return>") 'silver-brain-follow-link)
 (define-key silver-brain-mode-map (kbd "C-<return>") 'silver-brain-follow-link-new-window)

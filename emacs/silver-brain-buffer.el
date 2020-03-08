@@ -64,36 +64,52 @@ If NO-EDITOR-P is T, exclude the side buffers used by poly-mode."
 (defun silver-brain--setup-buffer (concept)
   "Setup buffer with given CONCEPT."
   (setq silver-brain--concept concept)
-  (let ((start-point (point)))
-    (insert "Concept - " (silver-brain-concept-name concept) "\n")
-    (let ((end-point (point)))
-      (put-text-property start-point end-point 'font-lock-face 'bold)))
-  ;; Draw relations.
-  (let* ((uuid (silver-brain-concept-uuid concept))
-         (parents (silver-brain-api--get-relation 'parent uuid))
-         (children (silver-brain-api--get-relation 'child uuid))
-         (friends (silver-brain-api--get-relation 'friend uuid)))
-      (silver-brain--draw-relations concept parents children friends))
-  (insert "\n" (silver-brain--make-separator))
-  ;; Make head part read-only.
-  (setq silver-brain--head-end-point (point-max))
-  (insert "\n")
-  (add-text-properties (point-min) silver-brain--head-end-point
-                       '(read-only t silver-brain-relation t))
-  (insert (silver-brain-concept-content concept))
-  (goto-char (point-min))
-  (forward-line)
-  (add-hook 'kill-buffer-hook 'silver-brain-confirm-save nil t)
-  (set-buffer-modified-p nil))
+  (let ((inhibit-read-only t))
+   (magit-insert-section (concept)
+
+     (magit-insert-heading
+       (propertize
+        (concat "Concept ~ " (silver-brain-concept-name concept))
+        'font-lock-face 'bold))
+     (newline)
+     ;; Draw relations.
+
+     (let* ((uuid (silver-brain-concept-uuid concept))
+            (parents (silver-brain-api--get-relation 'parent uuid))
+            (children (silver-brain-api--get-relation 'child uuid))
+            (friends (silver-brain-api--get-relation 'friend uuid)))
+       (silver-brain--draw-relations concept parents children friends))
+     (newline)
+     (insert (silver-brain--make-separator))
+     ;; Make head part read-only.
+     (setq silver-brain--head-end-point (point-max))
+     (newline)
+     (add-text-properties (point-min) silver-brain--head-end-point
+                          '(read-only t silver-brain-relation t))
+     (insert (silver-brain-concept-content concept))
+     (goto-char (point-min))
+     (forward-line)
+     (add-hook 'kill-buffer-hook 'silver-brain-confirm-save nil t)
+     (set-buffer-modified-p nil))))
+
+(require 'magit-section)
+
+(defun silver-brain--draw-rel (display-section els)
+  (magit-insert-section (foo)
+    (magit-insert-heading display-section)
+    (dolist (el els)
+      (newline)
+      (magit-insert-section (bar)
+        (silver-brain--insert-link el)))))
 
 (defun silver-brain--draw-relations (concept parents children friends)
   "Insert PARENTS, CHILDREN and FRIENDS relations of given CONCEPT."
-  (insert "\nParents: ")
-  (dolist (parent parents) (silver-brain--insert-link parent))
-  (insert "\n\nChildren: ")
-  (dolist (child children) (silver-brain--insert-link child))
-  (insert "\n\nFriends: ")
-  (dolist (friend friends) (silver-brain--insert-link friend)))
+
+  (silver-brain--draw-rel "Parents: " parents)
+  (newline)
+  (silver-brain--draw-rel "Children: " children)
+  (newline)
+  (silver-brain--draw-rel "Friends: " friends))
 
 (defun silver-brain--insert-link (concept)
   "Insert a link according to given CONCEPT into current buffer."
@@ -101,12 +117,10 @@ If NO-EDITOR-P is T, exclude the side buffers used by poly-mode."
         (start (point)))
     (when (> (length name) (- (window-width) (current-column)))
       (insert "\n"))
-    (insert-button (silver-brain-concept-name concept)
+    (insert-button (propertize (silver-brain-concept-name concept)
+                               'uuid (silver-brain-concept-uuid concept))
                    'help-echo "Open this concept."
-                   'action 'silver-brain-follow-link)
-    (let ((end (point)))
-      (insert " ")
-      (put-text-property start end 'uuid (silver-brain-concept-uuid concept)))))
+                   'action 'silver-brain-follow-link)))
 
 (cl-defun silver-brain--make-separator (&optional width)
   "Return a string representing the separator between head and body."
