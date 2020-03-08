@@ -79,18 +79,21 @@ If NO-EDITOR-P is T, exclude the side buffers used by poly-mode."
             (children (silver-brain-api--get-relation 'child uuid))
             (friends (silver-brain-api--get-relation 'friend uuid)))
        (silver-brain--draw-relations concept parents children friends))
-     (newline)
-     (insert (silver-brain--make-separator))
-     ;; Make head part read-only.
-     (setq silver-brain--head-end-point (point-max))
-     (newline)
-     (add-text-properties (point-min) silver-brain--head-end-point
-                          '(read-only t silver-brain-relation t))
-     (insert (silver-brain-concept-content concept))
-     (goto-char (point-min))
-     (forward-line)
-     (add-hook 'kill-buffer-hook 'silver-brain-confirm-save nil t)
-     (set-buffer-modified-p nil))))
+     (insert "\n" (silver-brain--make-separator))
+  ;; Make head part read-only.
+  (setq silver-brain--head-end-point (point-max))
+  (insert "\n")
+  (add-text-properties (point-min) silver-brain--head-end-point
+                       '(read-only t silver-brain-relation t))
+  (insert (silver-brain-concept-content concept))
+  (goto-char (point-min))
+  (forward-line)
+  (add-hook 'kill-buffer-hook 'silver-brain-confirm-save nil t)
+  (set-buffer-modified-p nil)
+  ;; (setq buffer-read-only nil)
+  )))
+
+
 
 (require 'magit-section)
 
@@ -120,10 +123,13 @@ If NO-EDITOR-P is T, exclude the side buffers used by poly-mode."
     (insert-button (propertize (silver-brain-concept-name concept)
                                'uuid (silver-brain-concept-uuid concept))
                    'help-echo "Open this concept."
-                   'action 'silver-brain-follow-link)))
+                   'action 'silver-brain-follow-link)
+    (let ((end (point)))
+      (insert " ")
+      (put-text-property start end 'uuid (silver-brain-concept-uuid concept)))))
 
 (cl-defun silver-brain--make-separator (&optional width)
-  "Return a string representing the separator between head and body."
+  "Return a stri              ng representing the separator between head and body."
   (make-string (if width width (window-width)) ?-))
 
 (defun silver-brain--make-impossible-matcher ()

@@ -32,8 +32,49 @@ Supported values are: plain, markdown, org")
 ;;;;                             Modes                            ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define-derived-mode silver-brain-mode magit-section-mode "Brain"
+
+(define-derived-mode jhnn-magit-section-mode special-mode "Magit-Sections"
+  "Parent major mode from which major modes with Magit-like sections inherit.
+
+Magit-Section is documented in info node `(magit-section)'."
+  :group 'magit-section
+  ;; (buffer-disable-undo)
+  (setq truncate-lines t)
+  ;; (setq buffer-read-only t)
+  (setq-local line-move-visual t) ; see #1771
+  ;; Turn off syntactic font locking, but not by setting
+  ;; `font-lock-defaults' because that would enable font locking, and
+  ;; not all magit plugins may be ready for that (see #3950).
+  (setq-local font-lock-syntactic-face-function #'ignore)
+  (setq show-trailing-whitespace nil)
+  (setq-local symbol-overlay-inhibit-map t)
+  (setq list-buffers-directory (abbreviate-file-name default-directory))
+  ;; (hack-dir-local-variables-non-file-buffer)
+  (make-local-variable 'text-property-default-nonsticky)
+  (push (cons 'keymap t) text-property-default-nonsticky)
+  (add-hook 'post-command-hook #'magit-section-update-highlight t t)
+  (add-hook 'deactivate-mark-hook #'magit-section-update-highlight t t)
+  (setq-local redisplay-highlight-region-function
+              'magit-section--highlight-region)
+  (setq-local redisplay-unhighlight-region-function
+              'magit-section--unhighlight-region)
+  (when magit-section-disable-line-numbers
+    (when (bound-and-true-p global-linum-mode)
+      (linum-mode -1))
+    (when (and (fboundp 'nlinum-mode)
+               (bound-and-true-p global-nlinum-mode))
+      (nlinum-mode -1))
+    (when (and (fboundp 'display-line-numbers-mode)
+               (bound-and-true-p global-display-line-numbers-mode))
+      (display-line-numbers-mode -1)))
+  (when (fboundp 'magit-preserve-section-visibility-cache)
+    (add-hook 'kill-buffer-hook #'magit-preserve-section-visibility-cache)))
+
+(define-derived-mode silver-brain-mode text-mode "Brain"
   "Main mode for single concept Silver Brain."
+  (magit-section))
+
+(define-derived-mode jhnn-org org-mode "Mind"
   )
 
 
@@ -273,7 +314,7 @@ RELATION should be a symbol one of: '(parent child friend)."
   :mode 'silver-brain-mode)
 
 (define-innermode silver-brain--org-innermode
-  :mode 'org-mode
+  :mode 'jhnn-org
   :head-matcher (silver-brain--make-separator 10)
   :tail-matcher (silver-brain--make-impossible-matcher)
   :head-mode 'body
