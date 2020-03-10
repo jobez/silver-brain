@@ -4,6 +4,8 @@
   "Return all relation objects."
   (mito:select-dao 'concept-relation))
 
+;; (read-all-concept-relations)
+
 (defun delete-relations-between (uuid1 uuid2)
   "Delete all relations between CONCEPT1 and CONCEPT2."
   (mito:delete-by-values 'concept-relation
@@ -18,8 +20,12 @@
   (mito:delete-by-values 'concept-relation :source uuid)
   (mito:delete-by-values 'concept-relation :target uuid))
 
-(defun add-relation (source-uuid target-uuid)
+(defun add-relation (source-uuid target-uuid &optional (name nil))
   "Add a relation from SOURCE-UUID to TARGET-UUID."
   (mito:insert-dao (make-instance 'concept-relation
+                                  :name name
                                   :source source-uuid
                                   :target target-uuid)))
+
+
+;; (add-relation

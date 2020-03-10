@@ -263,6 +263,11 @@ Should be called in silver-brain-mode buffers."
   (interactive)
   (silver-brain--add-relation 'parent))
 
+(defun silver-brain-add-treatment ()
+  "Add a parent."
+  (interactive)
+  (silver-brain--add-relation 'treatment))
+
 (defun silver-brain-add-child ()
   "Add a child."
   (interactive)

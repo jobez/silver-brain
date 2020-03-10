@@ -102,13 +102,18 @@
          (mapcar #'concept-summary)
          (render-json-array))))
 
-(defroute *app* PUT "/api/concepts/:uuid/friends/:friend-uuid" (uuid friend-uuid)
+(defroute *app* PUT "/api/concepts/:uuid/treatment/:friend-uuid" (uuid friend-uuid)
   (let ((concept (get-concept-by-uuid-or-404 uuid))
         (friend (get-concept-by-uuid-or-404 friend-uuid)))
     (when (string= uuid friend-uuid)
       (error 'bad-request))
     (service:make-friend friend concept)
-  nil))
+    nil))
+
+((db:relation-name relation)
+         (entreat (relation-name relation)
+                  source
+                  target))
 
 (defroute *app* DELETE "/api/concepts/:uuid/friends/:friend-uuid" (uuid friend-uuid)
   (let ((concept (get-concept-by-uuid-or-404 uuid))
