@@ -3,6 +3,9 @@
 (defvar *concept-map* (make-hash-table :test #'equal)
   "The map that caches all the concepts and their relationship.")
 
+(setq *concept-map* (make-hash-table :test #'equal))
+"The map that caches all the concepts and their relationship."
+
 (defun setup ()
   "Setup the concept map."
   (let* ((db-concepts (db:read-all-concepts))
@@ -24,9 +27,13 @@
         (t
          (become-child target source))))))
 
+;; (setup)
+
 (defun get-all-concepts ()
   "Return all concepts as a list."
   (hash-table-values *concept-map*))
+
+;;
 
 (defun get-concept-by-uuid (uuid)
   "Return corresponding UUID from the cache."
@@ -75,6 +82,12 @@ The UUID must be valid."
   (core:become-friend concept friend)
   (db:add-relation (concept-uuid concept) (concept-uuid friend))
   (db:add-relation (concept-uuid friend) (concept-uuid concept)))
+
+(defun make-treatment (concept friend)
+  "Make them friends."
+  (core::entreat concept friend)
+  (db:add-relation (concept-uuid concept) (concept-uuid friend) "treatment"))
+
 
 (defun remove-relation (c1 c2)
   "Remove any relation between c1 and c2."

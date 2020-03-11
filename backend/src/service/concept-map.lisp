@@ -2,14 +2,17 @@
 
 (defvar *concept-map* (make-hash-table :test #'equal)
   "The map that caches all the concepts and their relationship.")
+;; (setq *concept-map* (make-hash-table :test #'equal))
 
 (defun setup ()
   "Setup the concept map."
   (let* ((db-concepts (db:read-all-concepts))
          (relations (db:read-all-concept-relations)))
     (iter (for concept in db-concepts)
-      (setf (gethash (db:concept-uuid concept) *concept-map*)
-            (db:db-concept-to-core-concept concept)))
+          (setf (gethash (db:concept-uuid concept)
+                         *concept-map*)
+                (db:db-concept-to-core-concept
+                 concept)))
     (iter (for relation in relations)
       (for source = (gethash (db:concept-relation-source relation) *concept-map*))
       (for target = (gethash (db:concept-relation-target relation) *concept-map*))
@@ -17,12 +20,21 @@
         ;; If any concept does not exist, ignore it.
         ((or (null source) (null target))
          (log:warn "Invalid record: ~a" relation))
+
+        ((db:relation-name relation)
+         (entreat (relation-name relation)
+                  source
+                  target))
         ;; If the target is the parent of source, make them friends.
         ((concept-childp target source)
-         (become-friend source target))
+
+         (log:info (become-friend source target)))
         ;; Otherwise, make child.
         (t
-         (become-child source target))))))
+         (log:info (become-child source target)))))))
+
+;; (setq *concept-map* (make-hash-table :test #'equal))
+;; (setup)
 
 (defun purge ()
   "Remove everything."
@@ -32,6 +44,8 @@
 (defun get-all-concepts ()
   "Return all concepts as a list."
   (hash-table-values *concept-map*))
+
+;; (cl-arrows:-> (get-all-concepts) first concept-friends)
 
 (defun get-concept-by-uuid (uuid)
   "Return corresponding UUID from the cache."

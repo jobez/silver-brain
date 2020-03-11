@@ -11,10 +11,10 @@
          :initarg :name
          :documentation "Name (title) of the concept.")
    (content-format :type string
-                 :accessor concept-content-format
-                 :initarg :content-format
-                 :initform ""
-                 :documentation "Content type of the concept. This should be
+                   :accessor concept-content-format
+                   :initarg :content-format
+                   :initform ""
+                   :documentation "Content type of the concept. This should be
 picked up by the UI.")
    (content :type string
             :accessor concept-content
@@ -35,7 +35,12 @@ picked up by the UI.")
             :accessor concept-friends
             :initarg :friends
             :initform '()
-            :documentation "The list of references to its friends.")))
+            :documentation "The list of references to its friends.")
+   (treatments :type list
+               :accessor concept-treatments
+               :initarg :treatments
+               :initform '()
+               :documentation "The list of references to its friends.")))
 
 (defmethod print-object ((concept concept) out)
   (format out "#<Concept ~a>" (concept-name concept)))
@@ -45,6 +50,10 @@ picked up by the UI.")
   (unless (concept-childp concept child)
     (remove-relations-between concept child)
     (add-child concept child)))
+
+(defun entreat (treatment concept)
+  "named scope of concept"
+  (pushnew treatment (concept-treatments concept)))
 
 (defun become-friend (concept friend)
   "Make FRIEND and CONCEPT friends of each other."
