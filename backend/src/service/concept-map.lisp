@@ -73,3 +73,11 @@ The UUID must be valid."
   (remhash uuid *concept-map*)
   (db:delete-concept uuid)
   (db:delete-relations-of uuid))
+
+(defmacro comment (&rest args)
+  nil)
+
+(comment
+ *concept-map*
+ (iter (for (key val) in-hashtable *concept-map*)
+      (collect val)))

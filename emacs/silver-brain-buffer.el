@@ -63,7 +63,7 @@ If NO-EDITOR-P is T, exclude the side buffers used by poly-mode."
 
 (defun silver-brain--setup-buffer (concept)
   "Setup buffer with given CONCEPT."
-  (setq silver-brain--concept concept)
+  (setq-local silver-brain--concept concept)
   (let ((inhibit-read-only t))
    (magit-insert-section (concept)
 

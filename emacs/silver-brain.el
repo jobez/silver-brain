@@ -110,6 +110,18 @@ Magit-Section is documented in info node `(magit-section)'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;                              UI                              ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun silver-brain-region-to-concept (b e)
+  (interactive "r")
+  (-let* ((target-uuid
+           (silver-brain-search--select-or-create (buffer-substring-no-properties b e) :create t))
+          (concept-name
+          (silver-brain-concept-name
+           (silver-brain-api--get-concept target-uuid))))
+    (insert
+     (format "[[sb:%s][%s]]"
+             target-uuid
+             concept-name))))
+
 (defun silver-brain-get-uuid-at-point (point)
   (interactive "d")
   (copy-to-clipboard
@@ -134,7 +146,7 @@ Magit-Section is documented in info node `(magit-section)'."
          (concept-name
           (silver-brain-concept-name
            (silver-brain-api--get-concept target-uuid))))
-   (insert
+    (insert
     (format "[[sb:%s][%s]]"
             target-uuid
             concept-name))))
